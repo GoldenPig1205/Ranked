@@ -37,7 +37,8 @@ namespace Ranked.Core.Classes
     public static class UsersManager
     {
         /*
-        RP - 0
+        Name - 0
+        RP - 1
         */
 
         public static string UsersFileName = Path.Combine(Paths.Configs, "Ranked/Users.txt");
@@ -60,12 +61,9 @@ namespace Ranked.Core.Classes
 
         public static void SaveUsers()
         {
-            if (IsUsersFileLoaded)
-            {
-                var text = string.Join("\n", UsersCache.Select(x => $"{x.Key};{string.Join(";", x.Value)}"));
+            var text = string.Join("\n", UsersCache.Select(x => $"{x.Key};{string.Join(";", x.Value)}"));
 
-                FileManager.WriteFile(UsersFileName, text);
-            }
+            FileManager.WriteFile(UsersFileName, text);
         }
 
         public static void LoadUsers()
@@ -86,8 +84,6 @@ namespace Ranked.Core.Classes
 
                 UsersCache.Add(parts[0], parts.Skip(1).ToList());
             }
-
-            IsUsersFileLoaded = true;
         }
     }
 }

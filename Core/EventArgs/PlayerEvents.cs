@@ -50,16 +50,18 @@ namespace Ranked.Core.EventArgs
             }
             else
             {
-                List<string> uc = UsersManager.UsersCache[ev.Player.UserId];
-
-                if (uc.Count < DefaultValues.Count)
+                try
                 {
-                    int diff = DefaultValues.Count - uc.Count;
-
-                    for (int i = 0; i < diff; i++)
-                        uc.Add("0");
-
+                    UsersManager.UsersCache[ev.Player.UserId][0] = ev.Player.Nickname;
                     UsersManager.SaveUsers();
+
+                    ev.Player.Group = null;
+                    ev.Player.RankName = null;
+                    ev.Player.BadgeHidden = false;
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e);
                 }
             }
         }

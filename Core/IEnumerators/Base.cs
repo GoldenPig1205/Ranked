@@ -17,6 +17,7 @@ using PlayerRoles.FirstPersonControl;
 using PlayerRoles;
 using System.Threading;
 using Ranked.Core.Classes;
+using System;
 
 namespace Ranked.Core.IEnumerators
 {
@@ -66,9 +67,48 @@ namespace Ranked.Core.IEnumerators
         {
             while (Round.IsLobby)
             {
+                List<string> queue = new List<string>();
+
+                string c(int num)
+                {
+                    switch (num)
+                    {
+                        case 1:
+                            return $"<color=#ffd700>#{num}</color>";
+
+                        case 2:
+                            return $"<color=#c0c0c0>#{num}</color>";
+
+                        case 3:
+                            return $"<color=#cd7f32>#{num}</color>";
+
+                        default:
+                            return $"#{num}";
+                    }
+                }
+
+                foreach (var user in UsersManager.UsersCache.OrderByDescending(x =>
+                {
+                    int exp;
+                    return int.TryParse(x.Value[1], out exp) ? exp : 0;
+                }).Take(10))
+                {
+                    try
+                    {
+                        string Name = user.Value[0];
+                        string RP = user.Value[1];
+
+                        queue.Add($"{c(queue.Count() + 1)} - <b>{Name}</b>(<color=orange>{RP}</color>)\n<size=15><color=#D9D9D9>{user.Key}</color></size>");
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e);
+                    }
+                }
+
                 foreach (var player in Player.List)
                 {
-                    player.ShowHint("\n");
+                    player.ShowHint($"<align=left><size=25><b><color=#00FF55>D</color><color=#11FB66>A</color><color=#22F878>O</color><color=#33F489>N</color><color=#44F19B>:</color> <color=#66EABE>R</color><color=#60EDC8>a</color><color=#5BF1D2>n</color><color=#56F4DD>k</color><color=#51F8E7>e</color><color=#4CFBF1>d</color> <color=red>#경쟁전</color> 리더보드</b></size>\n\n<size=25>{string.Join("\n", queue)}</size></align>\n\n\n\n\n");
                 }
 
                 yield return Timing.WaitForSeconds(1);

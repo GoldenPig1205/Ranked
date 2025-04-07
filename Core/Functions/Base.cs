@@ -39,20 +39,20 @@ namespace Ranked.Core.Functions
 
         public static void AddRP(this Player player, int amount)
         {
-            UsersManager.UsersCache[player.UserId][0] = (int.Parse(UsersManager.UsersCache[player.UserId][0]) + amount).ToString();
+            UsersManager.UsersCache[player.UserId][1] = (int.Parse(UsersManager.UsersCache[player.UserId][1]) + amount).ToString();
         }
 
         public static void RemoveRP(this Player player, int amount)
         {
-            if (int.Parse(UsersManager.UsersCache[player.UserId][0]) - amount < 0)
-                amount = int.Parse(UsersManager.UsersCache[player.UserId][0]);
+            if (int.Parse(UsersManager.UsersCache[player.UserId][1]) - amount < 0)
+                amount = int.Parse(UsersManager.UsersCache[player.UserId][1]);
 
-            UsersManager.UsersCache[player.UserId][0] = (int.Parse(UsersManager.UsersCache[player.UserId][0]) - amount).ToString();
+            UsersManager.UsersCache[player.UserId][1] = (int.Parse(UsersManager.UsersCache[player.UserId][1]) - amount).ToString();
         }
 
         public static void SetRP(this Player player, int amount)
         {
-            UsersManager.UsersCache[player.UserId][0] = amount.ToString();
+            UsersManager.UsersCache[player.UserId][1] = amount.ToString();
         }
     }
 }
