@@ -20,6 +20,8 @@ using Exiled.API.Enums;
 using Interactables.Interobjects.DoorUtils;
 using MapEditorReborn.API.Enums;
 using PlayerRoles;
+using Ranked.Core.Classes;
+using Exiled.Events.EventArgs.Server;
 
 namespace Ranked.Core.EventArgs
 {
@@ -28,6 +30,8 @@ namespace Ranked.Core.EventArgs
         public static IEnumerator<float> OnWaitingForPlayers()
         {
             yield return Timing.WaitForSeconds(1);
+
+            UsersManager.LoadUsers();
 
             foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Plugins + "/audio/"))
             {
@@ -59,6 +63,25 @@ namespace Ranked.Core.EventArgs
             GlobalPlayer = AudioPlayer.CreateOrGet($"Global AudioPlayer", onIntialCreation: (p) =>
             {
                 Speaker speaker = p.AddSpeaker("Main", isSpatial: false, maxDistance: 5000);
+            });
+
+            Timing.RunCoroutine(LobbyLock());
+            Timing.RunCoroutine(LobbyMusic());
+            Timing.RunCoroutine(LobbyHint());
+
+            Timing.RunCoroutine(AutoSaveUserData());
+        }
+
+        public static void OnRoundStarted()
+        {
+            GlobalPlayer.RemoveAllClips();
+        }
+
+        public static void OnRoundEnded(RoundEndedEventArgs ev)
+        {
+            Timing.CallDelayed(9f, () =>
+            {
+                Server.ExecuteCommand("sr");
             });
         }
     }

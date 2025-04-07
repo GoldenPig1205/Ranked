@@ -115,6 +115,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Classes\FileManager.cs" />
     <Compile Include="Core\Classes\PlayerStatus.cs" />
     <Compile Include="Core\Classes\RemoteCommandSender.cs" />
     <Compile Include="Core\Configs\Config.cs" />

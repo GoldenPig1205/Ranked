@@ -31,6 +31,8 @@ using PlayerRoles.FirstPersonControl;
 using Exiled.Events.Commands.Hub;
 using RelativePositioning;
 using Exiled.API.Extensions;
+using Mirror;
+using System;
 
 namespace Ranked.Core.EventArgs
 {
@@ -38,6 +40,38 @@ namespace Ranked.Core.EventArgs
     {
         public static void OnVerified(VerifiedEventArgs ev)
         {
+            List<string> DefaultValues = Enumerable.Repeat("0", 15).ToList();
+
+            if (!UsersManager.UsersCache.ContainsKey(ev.Player.UserId))
+            {
+                UsersManager.AddUser(ev.Player.UserId, DefaultValues);
+
+                UsersManager.SaveUsers();
+            }
+            else
+            {
+                List<string> uc = UsersManager.UsersCache[ev.Player.UserId];
+
+                if (uc.Count < DefaultValues.Count)
+                {
+                    int diff = DefaultValues.Count - uc.Count;
+
+                    for (int i = 0; i < diff; i++)
+                        uc.Add("0");
+
+                    UsersManager.SaveUsers();
+                }
+            }
+        }
+
+        public static void OnChangingGroup(ChangingGroupEventArgs ev)
+        {
+            ulong permission = ev.Player.Group.Permissions;
+
+            Timing.CallDelayed(1, () =>
+            {
+                ev.Player.Group.Permissions = permission;
+            });
         }
     }
 }

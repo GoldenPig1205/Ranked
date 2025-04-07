@@ -26,15 +26,21 @@ namespace Ranked
             Instance = this;
 
             Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayers;
+            Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
+            Exiled.Events.Handlers.Server.RoundEnded += OnRoundEnded;
 
             Exiled.Events.Handlers.Player.Verified += OnVerified;
+            Exiled.Events.Handlers.Player.ChangingGroup += OnChangingGroup;
         }
 
         public override void OnDisabled()
         {
             Exiled.Events.Handlers.Server.WaitingForPlayers -= OnWaitingForPlayers;
+            Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
+            Exiled.Events.Handlers.Server.RoundEnded -= OnRoundEnded;
 
             Exiled.Events.Handlers.Player.Verified -= OnVerified;
+            Exiled.Events.Handlers.Player.ChangingGroup -= OnChangingGroup;
 
             Instance = null;
             base.OnDisabled();
