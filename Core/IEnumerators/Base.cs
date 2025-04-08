@@ -50,13 +50,13 @@ namespace Ranked.Core.IEnumerators
             while (Round.IsLobby)
             {
                 if (Server.PlayerCount >= 20)
-                    music = GlobalPlayer.AddClip("Clarx - Bones   Future House   NCS - Copyright Free Music", 0.5f);
+                    music = GlobalPlayer.AddClip("Clarx - Bones   Future House   NCS - Copyright Free Music", 0.3f);
 
                 else if (Server.PlayerCount >= 15)
-                    music = GlobalPlayer.AddClip("Escape the Backrooms OST - Escapee", 0.5f);
+                    music = GlobalPlayer.AddClip("Escape the Backrooms OST - Escapee", 0.3f);
 
                 else if (Server.PlayerCount >= 10)
-                    music = GlobalPlayer.AddClip("Escape the Backrooms OST - Menu", 0.3f);
+                    music = GlobalPlayer.AddClip("Escape the Backrooms OST - Menu", 0.2f);
 
                 else if (Server.PlayerCount >= 5)
                     music = GlobalPlayer.AddClip("Escape the Backrooms - Level 1 Ambience", 0.2f);
@@ -126,7 +126,7 @@ namespace Ranked.Core.IEnumerators
 $"""
 <align=left>
 [<color={ChangeColor(rank.Color)}>{rank.Icon} {rank.Name}</color>] - (<color=orange>{user[1]}</color>)
-<size=20>다음 랭크까지 <color=orange>{rpToNextRank}RP</color> 남음</size>
+<size=20>다음 랭크까지 <color=orange>{rpToNextRank}</color>RP 남음</size>
 
 <size=25><b><color=#00FF55>D</color><color=#11FB66>A</color><color=#22F878>O</color><color=#33F489>N</color><color=#44F19B>:</color> <color=#66EABE>R</color><color=#60EDC8>a</color><color=#5BF1D2>n</color><color=#56F4DD>k</color><color=#51F8E7>e</color><color=#4CFBF1>d</color> <color=red>#경쟁전</color> 리더보드</b></size>
 
@@ -136,7 +136,7 @@ $"""
 
 
 
-""");
+""", 1.2f);
                 }
 
                 yield return Timing.WaitForSeconds(1);
