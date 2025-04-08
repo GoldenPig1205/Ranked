@@ -33,6 +33,7 @@ using RelativePositioning;
 using Exiled.API.Extensions;
 using Mirror;
 using System;
+using Microsoft.Win32;
 
 namespace Ranked.Core.EventArgs
 {
@@ -50,22 +51,18 @@ namespace Ranked.Core.EventArgs
             }
             else
             {
-                try
-                {
-                    UsersManager.UsersCache[ev.Player.UserId][0] = ev.Player.Nickname;
-                    UsersManager.SaveUsers();
+                UsersManager.UsersCache[ev.Player.UserId][0] = ev.Player.Nickname;
+                UsersManager.SaveUsers();
 
-                    ev.Player.Group = null;
-                    ev.Player.RankName = null;
-                    ev.Player.BadgeHidden = false;
-                }
-                catch (Exception e)
-                {
-                    Log.Error(e);
-                }
+                float rp = float.Parse(UsersManager.UsersCache[ev.Player.UserId][1]);
+                Rank rank = Ranks.Where(rank => rp >= rank.RequiredScore).OrderByDescending(rank => rank.RequiredScore).FirstOrDefault();
+
+                ev.Player.Group = null;
+                ev.Player.RankName = $"{rank.Icon} {rank.Name}";
+                ev.Player.RankColor = rank.Color;
             }
         }
-
+    
         public static void OnChangingGroup(ChangingGroupEventArgs ev)
         {
             ulong permission = ev.Player.Group.Permissions;
