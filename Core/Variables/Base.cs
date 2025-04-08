@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Ranked.Core.Classes;
+using Exiled.API.Enums;
 
 namespace Ranked.Core.Variables
 {
@@ -25,6 +26,10 @@ namespace Ranked.Core.Variables
             new Rank { Name = "Apollyon", Icon = "🔱", Color = "deep_pink", RequiredScore = 1576 },
             new Rank { Name = "Archon", Icon = "🔰", Color = "carmine", RequiredScore = 2536 },
         };
+        public static List<ushort> ScpItems = new List<ushort> { };
+        public static List<ushort> SpecialWeapons = new List<ushort> { };
+        public static List<Generator> Generators = new List<Generator> { };
+        public static List<Player> RespawnPool = new List<Player> { };
 
         public static Dictionary<Player, AudioPlayer> AudioPlayers = new Dictionary<Player, AudioPlayer> { };
         public static Dictionary<string, List<string>> Audios = new Dictionary<string, List<string>>
@@ -32,6 +37,12 @@ namespace Ranked.Core.Variables
             { "BGMs", new List<string> { } },
             { "SEs", new List<string> { } },
             { "Audios", new List<string> { } }
+        };
+        public static Dictionary<LeadingTeam, List<Player>> Teams = new Dictionary<LeadingTeam, List<Player>>
+        {
+            { LeadingTeam.Anomalies, new List<Player> { } },
+            { LeadingTeam.FacilityForces, new List<Player> { } },
+            { LeadingTeam.ChaosInsurgency, new List<Player> { } },
         };
         public static Dictionary<Player, List<(string, float)>> PlayerScores = new Dictionary<Player, List<(string, float)>> { };
     }

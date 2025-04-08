@@ -36,6 +36,9 @@
     <Reference Include="0Harmony">
       <HintPath>..\Castle\Castle\bin\Debug\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="AiScp">
+      <HintPath>C:\Users\GoldenPig1205\AppData\Roaming\EXILED\Plugins\AiScp.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\SCPSL\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>

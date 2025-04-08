@@ -32,7 +32,6 @@ using Exiled.Events.Commands.Hub;
 using RelativePositioning;
 using Exiled.API.Extensions;
 using Mirror;
-using System;
 using Microsoft.Win32;
 
 namespace Ranked.Core.EventArgs
@@ -41,28 +40,186 @@ namespace Ranked.Core.EventArgs
     {
         public static void OnVerified(VerifiedEventArgs ev)
         {
-            List<string> DefaultValues = Enumerable.Repeat("0", 15).ToList();
-
-            if (!UsersManager.UsersCache.ContainsKey(ev.Player.UserId))
+            if (Round.IsLobby)
             {
-                UsersManager.AddUser(ev.Player.UserId, DefaultValues);
+                PlayerScores.Add(ev.Player, new List<(string, float)>());
 
-                UsersManager.SaveUsers();
-            }
-            else
-            {
-                UsersManager.UsersCache[ev.Player.UserId][0] = ev.Player.Nickname;
-                UsersManager.SaveUsers();
+                List<string> DefaultValues = Enumerable.Repeat("0", 15).ToList();
 
-                float rp = float.Parse(UsersManager.UsersCache[ev.Player.UserId][1]);
-                Rank rank = Ranks.Where(rank => rp >= rank.RequiredScore).OrderByDescending(rank => rank.RequiredScore).FirstOrDefault();
+                if (!UsersManager.UsersCache.ContainsKey(ev.Player.UserId))
+                {
+                    UsersManager.AddUser(ev.Player.UserId, DefaultValues);
 
-                ev.Player.Group = null;
-                ev.Player.RankName = $"{rank.Icon} {rank.Name}";
-                ev.Player.RankColor = rank.Color;
+                    UsersManager.SaveUsers();
+                }
+                else
+                {
+                    UsersManager.UsersCache[ev.Player.UserId][0] = ev.Player.Nickname;
+                    UsersManager.SaveUsers();
+
+                    float rp = float.Parse(UsersManager.UsersCache[ev.Player.UserId][1]);
+                    Rank rank = Ranks.Where(rank => rp >= rank.RequiredScore).OrderByDescending(rank => rank.RequiredScore).FirstOrDefault();
+
+                    ev.Player.RankName = $"{rank.Icon} {rank.Name}";
+                    ev.Player.RankColor = rank.Color;
+                }
+
+                ev.Player.Mute();
+                ev.Player.Role.Set(RoleTypeId.Spectator);
             }
         }
-    
+
+        public static void OnLeft(LeftEventArgs ev)
+        {
+            ev.Player.AddRP(-10);
+
+            if (PlayerScores.ContainsKey(ev.Player))
+                PlayerScores.Remove(ev.Player);
+        }
+
+        public static void OnSpawned(SpawnedEventArgs ev)
+        {
+            if (ev.Reason == SpawnReason.RoundStart)
+            {
+                ev.Player.UnMute();
+                ev.Player.DisplayNickname = $"{ev.Player.Role.Name} - {Random.Range(0, 10000).ToString("D4")}";
+                ev.Player.RankName = null;
+                ev.Player.RankColor = null;
+            }
+
+            if (ev.Player.IsAlive)
+            {
+                foreach (var team in Teams)
+                {
+                    if (team.Value.Contains(ev.Player))
+                    {
+                        team.Value.Remove(ev.Player);
+                    }
+                }
+
+                if (Teams.ContainsKey(ev.Player.LeadingTeam))
+                    Teams[ev.Player.LeadingTeam].Add(ev.Player);
+            }
+        }
+
+        public static void OnHurt(HurtEventArgs ev)
+        {
+            if (Round.IsEnded)
+                return;
+                
+            if (ev.Attacker != null && !ev.Attacker.IsScp)
+            {
+                if (HitboxIdentity.IsEnemy(ev.Attacker.ReferenceHub, ev.Player.ReferenceHub))
+                {
+                    ev.Attacker.AddScore("처치 기여", ev.DamageHandler.Damage / 100);
+                }
+                else
+                {
+                    ev.Attacker.AddScore("아군 사격", -(ev.DamageHandler.Damage / 50));
+                }
+            }
+        }
+
+        public static IEnumerator<float> OnDied(DiedEventArgs ev)
+        {
+            if (Round.IsEnded)
+                yield break;
+
+            if (ev.Attacker != null && ev.Attacker.IsScp)
+            {
+                if (HitboxIdentity.IsEnemy(ev.Attacker.ReferenceHub, ev.Player.ReferenceHub))
+                {
+                    ev.Attacker.AddScore("인간 사살", 1);
+                }
+            }
+
+            LeadingTeam t = default;
+
+            foreach (var team in Teams)
+            {
+                if (team.Value.Contains(ev.Player))
+                {
+                    t = team.Key;
+                }
+            }
+
+            yield return Timing.WaitForSeconds(1);
+
+            if (t != default)
+            {
+                if (t == LeadingTeam.FacilityForces)
+                {
+                    GameObject gameObject = GameObject.Find("NTF SpawnPoint");
+
+                    ev.Player.Role.Set(RoleTypeId.NtfPrivate);
+                    ev.Player.Position = gameObject.transform.position;
+                    ev.Player.EnableEffect(EffectType.SoundtrackMute);
+
+                }
+
+                if (t == LeadingTeam.ChaosInsurgency)
+                {
+                    GameObject gameObject = GameObject.Find("CI SpawnPoint");
+
+                    ev.Player.Role.Set(RoleTypeId.ChaosRifleman);
+                    ev.Player.Position = gameObject.transform.position;
+                    ev.Player.EnableEffect(EffectType.SoundtrackMute);
+                }
+
+                RespawnPool.Add(ev.Player);
+            }
+        }
+
+        public static void OnEscaped(EscapedEventArgs ev)
+        {
+            if (Round.IsEnded)
+                return;
+
+            if (new List<RoleTypeId> 
+            { 
+                RoleTypeId.ClassD, 
+                RoleTypeId.Scientist
+            }.Contains(ev.Player.Role.Type))
+            {
+                ev.Player.AddScore("탈출", 2);
+            }
+        }
+
+        public static void OnItemAdded(ItemAddedEventArgs ev)
+        {
+            if (ev.Item.Type.ToString().Contains("SCP"))
+            {
+                if (!ScpItems.Contains(ev.Item.Serial))
+                {
+                    ScpItems.Add(ev.Item.Serial);
+
+                    ev.Player.AddScore("SCP 아이템 확보", 1);
+                }
+            }
+
+            if (new List<ItemType> 
+            {
+                ItemType.Jailbird,
+                ItemType.MicroHID,
+                ItemType.ParticleDisruptor
+            }.Contains(ev.Item.Type))
+            {
+                SpecialWeapons.Add(ev.Item.Serial);
+
+                ev.Player.AddScore("특수 무기 확보", 1);
+            }
+        }
+
+        public static void OnActivatingGenerator(ActivatingGeneratorEventArgs ev)
+        {
+            if (!Generators.Contains(ev.Generator))
+            {
+                Generators.Add(ev.Generator);
+
+                ev.Player.AddScore("발전기 가동", 1);
+            }
+        }
+
         public static void OnChangingGroup(ChangingGroupEventArgs ev)
         {
             ulong permission = ev.Player.Group.Permissions;

@@ -8,6 +8,7 @@ using Ranked.Core.Configs;
 using static Ranked.Core.EventArgs.ServerEvents;
 using static Ranked.Core.EventArgs.MapEvents;
 using static Ranked.Core.EventArgs.PlayerEvents;
+using Exiled.Events.EventArgs.Interfaces;
 
 namespace Ranked
 {
@@ -30,6 +31,13 @@ namespace Ranked
             Exiled.Events.Handlers.Server.RoundEnded += OnRoundEnded;
 
             Exiled.Events.Handlers.Player.Verified += OnVerified;
+            Exiled.Events.Handlers.Player.Left += OnLeft;
+            Exiled.Events.Handlers.Player.Spawned += OnSpawned;
+            Exiled.Events.Handlers.Player.Hurt += OnHurt;
+            Exiled.Events.Handlers.Player.Died += OnDied;
+            Exiled.Events.Handlers.Player.Escaped += OnEscaped;
+            Exiled.Events.Handlers.Player.ItemAdded += OnItemAdded;
+            Exiled.Events.Handlers.Player.ActivatingGenerator += OnActivatingGenerator;
             Exiled.Events.Handlers.Player.ChangingGroup += OnChangingGroup;
         }
 
@@ -40,6 +48,13 @@ namespace Ranked
             Exiled.Events.Handlers.Server.RoundEnded -= OnRoundEnded;
 
             Exiled.Events.Handlers.Player.Verified -= OnVerified;
+            Exiled.Events.Handlers.Player.Left -= OnLeft;
+            Exiled.Events.Handlers.Player.Spawned -= OnSpawned;
+            Exiled.Events.Handlers.Player.Hurt -= OnHurt;
+            Exiled.Events.Handlers.Player.Died -= OnDied;
+            Exiled.Events.Handlers.Player.Escaped -= OnEscaped;
+            Exiled.Events.Handlers.Player.ItemAdded -= OnItemAdded;
+            Exiled.Events.Handlers.Player.ActivatingGenerator -= OnActivatingGenerator;
             Exiled.Events.Handlers.Player.ChangingGroup -= OnChangingGroup;
 
             Instance = null;

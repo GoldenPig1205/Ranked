@@ -22,6 +22,7 @@ using MapEditorReborn.API.Enums;
 using PlayerRoles;
 using Ranked.Core.Classes;
 using Exiled.Events.EventArgs.Server;
+using System.Net.Sockets;
 
 namespace Ranked.Core.EventArgs
 {
@@ -30,6 +31,8 @@ namespace Ranked.Core.EventArgs
         public static IEnumerator<float> OnWaitingForPlayers()
         {
             yield return Timing.WaitForSeconds(1);
+
+            Server.FriendlyFire = true;
 
             UsersManager.LoadUsers();
 
@@ -79,10 +82,79 @@ namespace Ranked.Core.EventArgs
 
         public static void OnRoundEnded(RoundEndedEventArgs ev)
         {
-            Timing.CallDelayed(9f, () =>
+            Timing.CallDelayed(9, () =>
             {
                 Server.ExecuteCommand("sr");
             });
+
+            foreach (var player in Player.List.Where(x => PlayerScores.ContainsKey(x)))
+            {
+                if (player.IsAlive)
+                {
+                    player.AddScore("생존", 1);
+                }
+
+                if (ev.LeadingTeam != LeadingTeam.Draw)
+                {
+                    if (Teams[ev.LeadingTeam].Contains(player))
+                    {
+                        player.AddScore("승리", 10);
+                    }
+                    else
+                    {
+                        player.AddScore("패배", -10);
+                    }
+                }
+
+                List<string> queue = new List<string>();
+                float rp = 0;
+
+                string formatter(int i)
+                {
+                    if (i > 0)
+                    {
+                        return $"<color=#40FF00>+{i}</color>";
+                    }
+                    else if (i < 0)
+                    {
+                        return $"<color=red>{i}</color>";
+                    }
+                    else
+                    {
+                        return $"{i}";
+                    }
+                }
+
+                foreach (var score in PlayerScores[player])
+                {
+                    rp += score.Item2;
+
+                    queue.Add($"{score.Item1} ({formatter((int)score.Item2)})");
+                }
+
+                player.ShowHint(
+$"""
+<align=left>
+<size=20>
+<i>
+{string.Join("\n", queue)}
+</i>
+</size>
+
+<b>총합 : {formatter((int)rp)}RP</b>
+</align>
+
+
+
+
+
+
+
+
+
+""", ev.TimeToRestart);
+                player.AddRP((int)rp);
+            }
         }
     }
 }
