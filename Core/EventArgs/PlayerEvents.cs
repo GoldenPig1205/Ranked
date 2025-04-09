@@ -40,8 +40,6 @@ namespace Ranked.Core.EventArgs
     {
         public static void OnVerified(VerifiedEventArgs ev)
         {
-            PlayerScores.Add(ev.Player, new List<(string, float)>());
-
             List<string> DefaultValues = Enumerable.Repeat("0", 15).ToList();
 
             if (!UsersManager.UsersCache.ContainsKey(ev.Player.UserId))
@@ -79,7 +77,8 @@ namespace Ranked.Core.EventArgs
 
         public static void OnLeft(LeftEventArgs ev)
         {
-            PlayerScores.Remove(ev.Player);
+            if (PlayerScores.ContainsKey(ev.Player))
+                PlayerScores.Remove(ev.Player);
 
             if (!Round.IsLobby && !Round.IsEnded)
             {
@@ -99,6 +98,9 @@ namespace Ranked.Core.EventArgs
 
             if (ev.Player.IsAlive)
             {
+                if (!PlayerScores.ContainsKey(ev.Player))
+                    PlayerScores.Add(ev.Player, new List<(string, float)>());
+
                 foreach (var team in Teams)
                 {
                     if (team.Value.Contains(ev.Player))
@@ -142,42 +144,6 @@ namespace Ranked.Core.EventArgs
                     ev.Attacker.AddScore("인간 사살", 1);
                 }
             }
-
-            LeadingTeam t = default;
-
-            foreach (var team in Teams)
-            {
-                if (team.Value.Contains(ev.Player))
-                {
-                    t = team.Key;
-                }
-            }
-
-            yield return Timing.WaitForSeconds(1);
-
-            if (t != default)
-            {
-                if (t == LeadingTeam.FacilityForces)
-                {
-                    GameObject gameObject = GameObject.Find("NTF SpawnPoint");
-
-                    ev.Player.Role.Set(RoleTypeId.NtfPrivate);
-                    ev.Player.Position = gameObject.transform.position;
-                    ev.Player.EnableEffect(EffectType.SoundtrackMute);
-
-                }
-
-                if (t == LeadingTeam.ChaosInsurgency)
-                {
-                    GameObject gameObject = GameObject.Find("CI SpawnPoint");
-
-                    ev.Player.Role.Set(RoleTypeId.ChaosRifleman);
-                    ev.Player.Position = gameObject.transform.position;
-                    ev.Player.EnableEffect(EffectType.SoundtrackMute);
-                }
-
-                RespawnPool.Add(ev.Player);
-            }
         }
 
         public static void OnEscaped(EscapedEventArgs ev)
@@ -191,12 +157,15 @@ namespace Ranked.Core.EventArgs
                 RoleTypeId.Scientist
             }.Contains(ev.Player.Role.Type))
             {
-                ev.Player.AddScore("탈출", 2);
+                ev.Player.AddScore("탈출", 3);
             }
         }
 
         public static void OnItemAdded(ItemAddedEventArgs ev)
         {
+            if (Round.IsEnded)
+                return;
+
             if (ev.Item.Type.ToString().Contains("SCP"))
             {
                 if (!ScpItems.Contains(ev.Item.Serial))
@@ -222,6 +191,9 @@ namespace Ranked.Core.EventArgs
 
         public static void OnActivatingGenerator(ActivatingGeneratorEventArgs ev)
         {
+            if (Round.IsEnded)
+                return;
+
             if (!Generators.Contains(ev.Generator))
             {
                 Generators.Add(ev.Generator);
