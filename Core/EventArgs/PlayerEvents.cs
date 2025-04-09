@@ -40,41 +40,51 @@ namespace Ranked.Core.EventArgs
     {
         public static void OnVerified(VerifiedEventArgs ev)
         {
-            if (Round.IsLobby)
+            PlayerScores.Add(ev.Player, new List<(string, float)>());
+
+            List<string> DefaultValues = Enumerable.Repeat("0", 15).ToList();
+
+            if (!UsersManager.UsersCache.ContainsKey(ev.Player.UserId))
             {
-                PlayerScores.Add(ev.Player, new List<(string, float)>());
+                UsersManager.AddUser(ev.Player.UserId, DefaultValues);
 
-                List<string> DefaultValues = Enumerable.Repeat("0", 15).ToList();
+                UsersManager.SaveUsers();
+            }
+            else
+            {
+                UsersManager.UsersCache[ev.Player.UserId][0] = ev.Player.Nickname;
+                UsersManager.SaveUsers();
+            }
 
-                if (!UsersManager.UsersCache.ContainsKey(ev.Player.UserId))
-                {
-                    UsersManager.AddUser(ev.Player.UserId, DefaultValues);
+            if (Round.IsLobby) 
+            {
+                float rp = float.Parse(UsersManager.UsersCache[ev.Player.UserId][1]);
+                Rank rank = Ranks.Where(rank => rp >= rank.RequiredScore).OrderByDescending(rank => rank.RequiredScore).FirstOrDefault();
 
-                    UsersManager.SaveUsers();
-                }
-                else
-                {
-                    UsersManager.UsersCache[ev.Player.UserId][0] = ev.Player.Nickname;
-                    UsersManager.SaveUsers();
-
-                    float rp = float.Parse(UsersManager.UsersCache[ev.Player.UserId][1]);
-                    Rank rank = Ranks.Where(rank => rp >= rank.RequiredScore).OrderByDescending(rank => rank.RequiredScore).FirstOrDefault();
-
-                    ev.Player.RankName = $"{rank.Icon} {rank.Name}";
-                    ev.Player.RankColor = rank.Color;
-                }
+                ev.Player.RankName = $"{rank.Icon} {rank.Name}";
+                ev.Player.RankColor = rank.Color;
 
                 ev.Player.Mute();
                 ev.Player.Role.Set(RoleTypeId.Spectator);
+            }
+            else
+            {
+                ev.Player.DisplayNickname = $"Player - {Random.Range(0, 10000).ToString("D4")}";
+                ev.Player.RankName = null;
+                ev.Player.RankColor = null;
+
+                ev.Player.ShowHint($"경쟁전에 중도 참여하였습니다.");
             }
         }
 
         public static void OnLeft(LeftEventArgs ev)
         {
-            ev.Player.AddRP(-10);
+            PlayerScores.Remove(ev.Player);
 
-            if (PlayerScores.ContainsKey(ev.Player))
-                PlayerScores.Remove(ev.Player);
+            if (!Round.IsLobby && !Round.IsEnded)
+            {
+                ev.Player.AddRP(-10);
+            }
         }
 
         public static void OnSpawned(SpawnedEventArgs ev)
@@ -82,7 +92,7 @@ namespace Ranked.Core.EventArgs
             if (ev.Reason == SpawnReason.RoundStart)
             {
                 ev.Player.UnMute();
-                ev.Player.DisplayNickname = $"{ev.Player.Role.Name} - {Random.Range(0, 10000).ToString("D4")}";
+                ev.Player.DisplayNickname = $"Player - {Random.Range(0, 10000).ToString("D4")}";
                 ev.Player.RankName = null;
                 ev.Player.RankColor = null;
             }

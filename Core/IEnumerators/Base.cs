@@ -30,7 +30,7 @@ namespace Ranked.Core.IEnumerators
         {
             while (Round.IsLobby)
             {
-                if (Server.PlayerCount == Server.MaxPlayerCount)
+                if (Server.PlayerCount >= 10)
                 {
                     Round.IsLobbyLocked = false;
                 }

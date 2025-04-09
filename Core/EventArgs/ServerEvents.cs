@@ -87,6 +87,23 @@ namespace Ranked.Core.EventArgs
                 Server.ExecuteCommand("sr");
             });
 
+            List<(Player, int)> mvp = new List<(Player, int)>();
+            string formatter(int i)
+            {
+                if (i > 0)
+                {
+                    return $"<color=#40FF00>+{i}</color>";
+                }
+                else if (i < 0)
+                {
+                    return $"<color=red>{i}</color>";
+                }
+                else
+                {
+                    return $"{i}";
+                }
+            }
+
             foreach (var player in Player.List.Where(x => PlayerScores.ContainsKey(x)))
             {
                 if (player.IsAlive)
@@ -109,22 +126,6 @@ namespace Ranked.Core.EventArgs
                 List<string> queue = new List<string>();
                 float rp = 0;
 
-                string formatter(int i)
-                {
-                    if (i > 0)
-                    {
-                        return $"<color=#40FF00>+{i}</color>";
-                    }
-                    else if (i < 0)
-                    {
-                        return $"<color=red>{i}</color>";
-                    }
-                    else
-                    {
-                        return $"{i}";
-                    }
-                }
-
                 foreach (var score in PlayerScores[player])
                 {
                     rp += score.Item2;
@@ -133,18 +134,16 @@ namespace Ranked.Core.EventArgs
                 }
 
                 player.ShowHint(
-$"""
-<align=left>
-<size=20>
-<i>
-{string.Join("\n", queue)}
-</i>
-</size>
+ $"""
+        <align=left>
+        <size=20>
+        <i>
+        {string.Join("\n", queue)}
+        </i>
+        </size>
 
-<b>총합 : {formatter((int)rp)}RP</b>
-</align>
-
-
+        <b>총합 : {formatter((int)rp)}RP</b>
+        </align>
 
 
 
@@ -152,8 +151,27 @@ $"""
 
 
 
-""", ev.TimeToRestart);
+
+
+        """, ev.TimeToRestart);
                 player.AddRP((int)rp);
+
+                mvp.Add((player, (int)rp));
+            }
+
+            int maxRp = mvp.Max(x => x.Item2);
+            List<Player> mvps = mvp.Where(x => x.Item2 == maxRp).Select(x => x.Item1).ToList();
+
+            foreach (var player in Player.List)
+            {
+                float rp = float.Parse(UsersManager.UsersCache[player.UserId][1]);
+                Rank rank = Ranks.Where(rank => rp >= rank.RequiredScore).OrderByDescending(rank => rank.RequiredScore).FirstOrDefault();
+
+                player.DisplayNickname = "";
+                player.RankName = $"{rank.Icon} {rank.Name}";
+                player.RankColor = rank.Color;
+
+                player.AddBroadcast((ushort)ev.TimeToRestart, $"<b><size=25>이번 라운드의 <color=#ffd700>MVP</color>: {string.Join(",", mvps.Select(x => x.Nickname))}({formatter(maxRp)}RP)</size></b>");
             }
         }
     }
