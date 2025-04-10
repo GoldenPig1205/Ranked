@@ -44,6 +44,12 @@ namespace Ranked.Core.Variables
             { LeadingTeam.FacilityForces, new List<Player> { } },
             { LeadingTeam.ChaosInsurgency, new List<Player> { } },
         };
+        public static Dictionary<LeadingTeam, string> TeamNames = new Dictionary<LeadingTeam, string>
+        {
+            { LeadingTeam.Anomalies, "<color=red>SCP</color>" },
+            { LeadingTeam.FacilityForces, "<color=#00BFFF>NTF</color>" },
+            { LeadingTeam.ChaosInsurgency, "<color=#31B404>CHI</color>" },
+        };
         public static Dictionary<Player, List<(string, float)>> PlayerScores = new Dictionary<Player, List<(string, float)>> { };
     }
 }

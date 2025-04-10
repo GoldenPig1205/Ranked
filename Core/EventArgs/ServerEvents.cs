@@ -68,11 +68,12 @@ namespace Ranked.Core.EventArgs
                 Speaker speaker = p.AddSpeaker("Main", isSpatial: false, maxDistance: 5000);
             });
 
-            Timing.RunCoroutine(LobbyLock());
             Timing.RunCoroutine(LobbyMusic());
             Timing.RunCoroutine(LobbyHint());
 
             Timing.RunCoroutine(AutoSaveUserData());
+
+            Timing.RunCoroutine(ShowTeam());
         }
 
         public static void OnRoundStarted()
@@ -111,15 +112,15 @@ namespace Ranked.Core.EventArgs
                     player.AddScore("생존", 1);
                 }
 
-                if (ev.LeadingTeam != LeadingTeam.Draw)
+                if (Teams.Values.Any(x => x.Contains(player)))
                 {
-                    if (Teams[ev.LeadingTeam].Contains(player))
+                    if (Teams.ContainsKey(ev.LeadingTeam))
                     {
-                        player.AddScore("승리", 10);
-                    }
-                    else
-                    {
-                        player.AddScore("패배", -10);
+                        if (Teams[ev.LeadingTeam].Contains(player))
+                            player.AddScore("승리", 10);
+
+                        else
+                            player.AddScore("패배", -10);
                     }
                 }
 
@@ -171,7 +172,7 @@ namespace Ranked.Core.EventArgs
                 player.RankName = $"{rank.Icon} {rank.Name}";
                 player.RankColor = rank.Color;
 
-                player.AddBroadcast((ushort)ev.TimeToRestart, $"<b><size=25>이번 라운드의 <color=#ffd700>MVP</color>: {string.Join(",", mvps.Select(x => x.Nickname))}({formatter(maxRp)}RP)</size></b>");
+                player.AddBroadcast(20, $"<b><size=25>이번 라운드의 <color=#ffd700>MVP</color>: {string.Join(",", mvps.Select(x => x.Nickname))}({formatter(maxRp)}RP)</size></b>");
             }
         }
     }

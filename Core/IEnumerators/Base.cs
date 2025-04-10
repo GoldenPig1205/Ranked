@@ -26,23 +26,6 @@ namespace Ranked.Core.IEnumerators
 {
     public static class Base
     {
-        public static IEnumerator<float> LobbyLock()
-        {
-            while (Round.IsLobby)
-            {
-                if (Server.PlayerCount >= 10)
-                {
-                    Round.IsLobbyLocked = false;
-                }
-                else
-                {
-                    Round.IsLobbyLocked = true;
-                }
-
-                yield return Timing.WaitForSeconds(1);
-            }
-        }
-
         public static IEnumerator<float> LobbyMusic()
         {
             AudioClipPlayback music = null;
@@ -148,6 +131,55 @@ $"""
             while (true)
             {
                 UsersManager.LoadUsers();
+
+                yield return Timing.WaitForSeconds(1f);
+            }
+        }
+
+        public static IEnumerator<float> ShowTeam()
+        {
+            while (!Round.IsEnded)
+            {
+                foreach (var team in Teams)
+                {
+                    foreach (var player in team.Value)
+                    {
+                        player.ShowHint(
+$"""
+<align=left>
+<size=20>
+<i>
+<b>
+{TeamNames[team.Key]}
+</b>
+</i>
+</size>
+</align>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+""");
+                    }
+                }
 
                 yield return Timing.WaitForSeconds(1f);
             }

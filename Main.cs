@@ -8,6 +8,7 @@ using Ranked.Core.Configs;
 using static Ranked.Core.EventArgs.ServerEvents;
 using static Ranked.Core.EventArgs.MapEvents;
 using static Ranked.Core.EventArgs.PlayerEvents;
+using static Ranked.Core.EventArgs.Scp079Events;
 using Exiled.Events.EventArgs.Interfaces;
 
 namespace Ranked
@@ -30,6 +31,8 @@ namespace Ranked
             Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
             Exiled.Events.Handlers.Server.RoundEnded += OnRoundEnded;
 
+            Exiled.Events.Handlers.Scp079.GainingExperience += OnGainingExperience;
+
             Exiled.Events.Handlers.Player.Verified += OnVerified;
             Exiled.Events.Handlers.Player.Left += OnLeft;
             Exiled.Events.Handlers.Player.Spawned += OnSpawned;
@@ -46,6 +49,8 @@ namespace Ranked
             Exiled.Events.Handlers.Server.WaitingForPlayers -= OnWaitingForPlayers;
             Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
             Exiled.Events.Handlers.Server.RoundEnded -= OnRoundEnded;
+
+            Exiled.Events.Handlers.Scp079.GainingExperience -= OnGainingExperience;
 
             Exiled.Events.Handlers.Player.Verified -= OnVerified;
             Exiled.Events.Handlers.Player.Left -= OnLeft;

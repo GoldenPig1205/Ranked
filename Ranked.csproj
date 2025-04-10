@@ -125,6 +125,7 @@
     <Compile Include="Core\Configs\Config.cs" />
     <Compile Include="Core\EventArgs\MapEvents.cs" />
     <Compile Include="Core\EventArgs\PlayerEvents.cs" />
+    <Compile Include="Core\EventArgs\Scps\Scp079.cs" />
     <Compile Include="Core\EventArgs\ServerEvents.cs" />
     <Compile Include="Core\Extensions\Base.cs" />
     <Compile Include="Core\Functions\Base.cs" />

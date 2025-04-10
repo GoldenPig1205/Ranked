@@ -62,7 +62,6 @@ namespace Ranked.Core.EventArgs
                 ev.Player.RankName = $"{rank.Icon} {rank.Name}";
                 ev.Player.RankColor = rank.Color;
 
-                ev.Player.Mute();
                 ev.Player.Role.Set(RoleTypeId.Spectator);
             }
             else
@@ -90,7 +89,6 @@ namespace Ranked.Core.EventArgs
         {
             if (ev.Reason == SpawnReason.RoundStart)
             {
-                ev.Player.UnMute();
                 ev.Player.DisplayNickname = $"Player - {Random.Range(0, 10000).ToString("D4")}";
                 ev.Player.RankName = null;
                 ev.Player.RankColor = null;
@@ -157,7 +155,15 @@ namespace Ranked.Core.EventArgs
                 RoleTypeId.Scientist
             }.Contains(ev.Player.Role.Type))
             {
-                ev.Player.AddScore("탈출", 3);
+                if (ev.Player.IsCuffed)
+                {
+                    ev.Player.AddScore("체포 탈출", 1);
+                    ev.Player.Cuffer.AddScore("체포자", 2);
+                }
+                else
+                {
+                    ev.Player.AddScore("순수 탈출", 3);
+                }
             }
         }
 

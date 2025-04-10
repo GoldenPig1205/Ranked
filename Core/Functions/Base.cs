@@ -76,6 +76,15 @@ namespace Ranked.Core.Functions
 
         public static void AddScore(this Player player, string workName, float score)
         {
+            int maxPlayers = Server.MaxPlayerCount;
+            int currentPlayers = Server.PlayerCount;
+
+            if (currentPlayers < maxPlayers)
+            {
+                float factor = (float)currentPlayers / maxPlayers;
+                score *= factor;
+            }
+
             (string, float) info = PlayerScores[player].FirstOrDefault(x => x.Item1 == workName);
 
             if (info != default((string, float)))
