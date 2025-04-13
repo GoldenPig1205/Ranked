@@ -32,8 +32,6 @@ namespace Ranked.Core.EventArgs
         {
             yield return Timing.WaitForSeconds(1);
 
-            Server.FriendlyFire = true;
-
             UsersManager.LoadUsers();
 
             foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Plugins + "/audio/"))
