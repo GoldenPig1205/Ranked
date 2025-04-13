@@ -216,6 +216,8 @@ namespace Ranked.Core.EventArgs
             {
                 ev.Player.Group.Permissions = permission;
             });
+
+            ev.IsAllowed = false;
         }
     }
 }

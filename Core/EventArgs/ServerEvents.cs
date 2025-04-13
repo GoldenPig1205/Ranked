@@ -71,7 +71,7 @@ namespace Ranked.Core.EventArgs
 
             Timing.RunCoroutine(AutoSaveUserData());
 
-            Timing.RunCoroutine(ShowTeam());
+            //Timing.RunCoroutine(ShowTeam());
         }
 
         public static void OnRoundStarted()
@@ -118,7 +118,7 @@ namespace Ranked.Core.EventArgs
                             player.AddScore("승리", 10);
 
                         else
-                            player.AddScore("패배", -10);
+                            player.AddScore("패배", -15);
                     }
                 }
 
