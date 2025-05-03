@@ -1,88 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Exiled.API.Features;
-
-using static Ranked.Core.Variables.Base;
+﻿using Npgsql;
+using System;
+using System.Data;
 
 namespace Ranked.Core.Classes
 {
     public static class FileManager
     {
-        public static string FolderPath => Path.Combine(Paths.Configs, "Ranked");
+        private static string ConnectionString = "Host=localhost;Username=your_user;Password=your_password;Database=ranked";
 
-        public static void CreateFolder()
+        // Add rank points to a player
+        public static void AddRankPoints(string userId, int points, string eventType)
         {
-            if (!Directory.Exists(FolderPath))
-                Directory.CreateDirectory(FolderPath);
-        }
-
-        public static void WriteFile(string fileName, string content)
-        {
-            File.WriteAllText(Path.Combine(FolderPath, fileName), content);
-        }
-
-        public static string ReadFile(string fileName)
-        {
-            if (!File.Exists(Path.Combine(FolderPath, fileName)))
-                File.WriteAllText(Path.Combine(FolderPath, fileName), "");
-
-            return File.ReadAllText(Path.Combine(FolderPath, fileName));
-        }
-    }
-
-    public static class UsersManager
-    {
-        /*
-        Name - 0
-        RP - 1
-        */
-
-        public static string UsersFileName = Path.Combine(Paths.Configs, "Ranked/Users.txt");
-        public static Dictionary<string, List<string>> UsersCache = new Dictionary<string, List<string>>();
-
-        public static string CheckUser(string UserId, int num)
-        {
-            if (UsersCache.ContainsKey(UserId) && num >= 0 && num < UsersCache[UserId].Count)
-                return UsersCache[UserId][num];
-
-            return null;
-        }
-
-        public static bool AddUser(string UserId, List<string> UserInfo) 
-        {
-            UsersCache[UserId] = UserInfo;
-
-            return true;
-        }
-
-        public static void SaveUsers()
-        {
-            var text = string.Join("\n", UsersCache.Select(x => $"{x.Key};{string.Join(";", x.Value)}"));
-
-            FileManager.WriteFile(UsersFileName, text);
-        }
-
-        public static void LoadUsers()
-        {
-            var text = FileManager.ReadFile(UsersFileName);
-
-            if (string.IsNullOrWhiteSpace(text))
-                return;
-
-            UsersCache.Clear();
-
-            foreach (var line in text.Split('\n'))
+            using (var conn = new NpgsqlConnection(ConnectionString))
             {
-                var parts = line.Split(';');
+                conn.Open();
 
-                if (parts.Length != parts.Count())
-                    continue;
+                // Update player's rank points
+                using (var cmd = new NpgsqlCommand(
+                    @"INSERT INTO player (user_id, rank_points) 
+                    VALUES (@user_id, @points) 
+                    ON CONFLICT (user_id) DO UPDATE SET 
+                    rank_points = player.rank_points + @points;", conn))
+                {
+                    cmd.Parameters.AddWithValue("user_id", userId);
+                    cmd.Parameters.AddWithValue("points", points);
+                    cmd.ExecuteNonQuery();
+                }
 
-                UsersCache.Add(parts[0], parts.Skip(1).ToList());
+                // Log the event
+                using (var cmd = new NpgsqlCommand(
+                    @"INSERT INTO events (user_id, event_type, points) 
+                    VALUES (@user_id, @event_type, @points);", conn))
+                {
+                    cmd.Parameters.AddWithValue("user_id", userId);
+                    cmd.Parameters.AddWithValue("event_type", eventType);
+                    cmd.Parameters.AddWithValue("points", points);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // Get rank points for a player
+        public static int GetRankPoints(string userId)
+        {
+            using (var conn = new NpgsqlConnection(ConnectionString))
+            {
+                conn.Open();
+
+                using (var cmd = new NpgsqlCommand(
+                    @"SELECT rank_points FROM player WHERE user_id = @user_id;", conn))
+                {
+                    cmd.Parameters.AddWithValue("user_id", userId);
+                    var result = cmd.ExecuteScalar();
+                    return result != null ? Convert.ToInt32(result) : 0;
+                }
+            }
+        }
+
+        // Update player's rank level
+        public static void UpdateRankLevel(string userId, string rankLevel)
+        {
+            using (var conn = new NpgsqlConnection(ConnectionString))
+            {
+                conn.Open();
+
+                using (var cmd = new NpgsqlCommand(
+                    @"UPDATE player SET rank_level = @rank_level WHERE user_id = @user_id;", conn))
+                {
+                    cmd.Parameters.AddWithValue("user_id", userId);
+                    cmd.Parameters.AddWithValue("rank_level", rankLevel);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
     }

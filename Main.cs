@@ -27,40 +27,24 @@ namespace Ranked
             base.OnEnabled();
             Instance = this;
 
-            Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayers;
-            Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
-            Exiled.Events.Handlers.Server.RoundEnded += OnRoundEnded;
-
             Exiled.Events.Handlers.Scp079.GainingExperience += OnGainingExperience;
 
             Exiled.Events.Handlers.Player.Verified += OnVerified;
             Exiled.Events.Handlers.Player.Left += OnLeft;
-            Exiled.Events.Handlers.Player.Spawned += OnSpawned;
             Exiled.Events.Handlers.Player.Hurt += OnHurt;
             Exiled.Events.Handlers.Player.Died += OnDied;
             Exiled.Events.Handlers.Player.Escaped += OnEscaped;
-            Exiled.Events.Handlers.Player.ItemAdded += OnItemAdded;
-            Exiled.Events.Handlers.Player.ActivatingGenerator += OnActivatingGenerator;
-            Exiled.Events.Handlers.Player.ChangingGroup += OnChangingGroup;
         }
 
         public override void OnDisabled()
         {
-            Exiled.Events.Handlers.Server.WaitingForPlayers -= OnWaitingForPlayers;
-            Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
-            Exiled.Events.Handlers.Server.RoundEnded -= OnRoundEnded;
-
             Exiled.Events.Handlers.Scp079.GainingExperience -= OnGainingExperience;
 
             Exiled.Events.Handlers.Player.Verified -= OnVerified;
             Exiled.Events.Handlers.Player.Left -= OnLeft;
-            Exiled.Events.Handlers.Player.Spawned -= OnSpawned;
             Exiled.Events.Handlers.Player.Hurt -= OnHurt;
             Exiled.Events.Handlers.Player.Died -= OnDied;
             Exiled.Events.Handlers.Player.Escaped -= OnEscaped;
-            Exiled.Events.Handlers.Player.ItemAdded -= OnItemAdded;
-            Exiled.Events.Handlers.Player.ActivatingGenerator -= OnActivatingGenerator;
-            Exiled.Events.Handlers.Player.ChangingGroup -= OnChangingGroup;
 
             Instance = null;
             base.OnDisabled();

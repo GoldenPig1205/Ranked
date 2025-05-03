@@ -62,17 +62,17 @@ namespace Ranked.Core.Functions
         }
 
 
-        public static void AddRP(this Player player, int amount)
-        {
-            UsersManager.UsersCache[player.UserId][1] = Math.Max(0, int.Parse(UsersManager.UsersCache[player.UserId][1]) + amount).ToString();
-            UsersManager.SaveUsers();
-        }
+        //public static void AddRP(this Player player, int amount)
+        //{
+        //    UsersManager.UsersCache[player.UserId][1] = Math.Max(0, int.Parse(UsersManager.UsersCache[player.UserId][1]) + amount).ToString();
+        //    UsersManager.SaveUsers();
+        //}
 
-        public static void SetRP(this Player player, int amount)
-        {
-            UsersManager.UsersCache[player.UserId][1] = amount.ToString();
-            UsersManager.SaveUsers();
-        }
+        //public static void SetRP(this Player player, int amount)
+        //{
+        //    UsersManager.UsersCache[player.UserId][1] = amount.ToString();
+        //    UsersManager.SaveUsers();
+        //}
 
         public static void AddScore(this Player player, string workName, float score)
         {
