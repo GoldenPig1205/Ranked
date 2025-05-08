@@ -36,18 +36,12 @@
     <Reference Include="0Harmony">
       <HintPath>..\Castle\Castle\bin\Debug\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="AiScp">
-      <HintPath>C:\Users\GoldenPig1205\AppData\Roaming\EXILED\Plugins\AiScp.dll</HintPath>
-    </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\SCPSL\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-Publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SCPSL\14.0\SCPSL_Data\Managed\Assembly-CSharp-Publicized.dll</HintPath>
-    </Reference>
-    <Reference Include="AudioPlayer">
-      <HintPath>..\..\..\Users\11010박경현\AppData\Roaming\EXILED\Plugins\dependencies\AudioPlayer.dll</HintPath>
     </Reference>
     <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ExMod.Exiled.9.5.2\lib\net48\CommandSystem.Core.dll</HintPath>

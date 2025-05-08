@@ -14,8 +14,6 @@ namespace Ranked.Core.Variables
 {
     public static class Base
     {
-        public static AudioPlayer GlobalPlayer;
-
         public static List<Rank> Ranks = new List<Rank>
         {
             new Rank { Name = "Neutralized", Icon = "🔎", Color = "nickel", RequiredScore = 0 },
@@ -31,13 +29,6 @@ namespace Ranked.Core.Variables
         public static List<Generator> Generators = new List<Generator> { };
         public static List<Player> RespawnPool = new List<Player> { };
 
-        public static Dictionary<Player, AudioPlayer> AudioPlayers = new Dictionary<Player, AudioPlayer> { };
-        public static Dictionary<string, List<string>> Audios = new Dictionary<string, List<string>>
-        {
-            { "BGMs", new List<string> { } },
-            { "SEs", new List<string> { } },
-            { "Audios", new List<string> { } }
-        };
         public static Dictionary<LeadingTeam, List<Player>> Teams = new Dictionary<LeadingTeam, List<Player>>
         {
             { LeadingTeam.Anomalies, new List<Player> { } },
